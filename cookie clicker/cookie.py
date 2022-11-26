@@ -28,8 +28,8 @@ pen.goto(0,300)
 pen.write(f"Time starts upon your first click", align="center", font=("Roboto", 26 , "normal"))
 pen.goto(0, 250)
 pen.write(f"Click on F Once you finish to Show your speed", align="center", font=("Roboto", 18 , "normal"))
-if (clicks == 1):
-    start_time = time.time()
+# if (clicks == 1):
+#     start_time = time.time()
 def exitgm():
     global clicks
     pen.clear()
