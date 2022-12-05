@@ -1,152 +1,94 @@
-import turtle
+import pygame
 import random
 import time
+pygame.init()
+white = (255, 255, 255)
+yellow = (255, 255, 102)
+black = (0, 0, 0)
+red = (213, 50, 80)
+green = (0, 255, 0)
+blue = (50, 153, 213)
+dis_width = 800
+dis_height = 600
+dis = pygame.display.set_mode([dis_width, dis_height])
+pygame.display.set_caption('Snake')
 
-player_score = 0
-highest_score = 0
-delay_time = 0.1
-# window screen created
-wind = turtle.Screen()
-wind.title("Snake Maze🐍")
-wind.bgcolor("red")
+clock = pygame.time.Clock()
 
-# The screen size
-wind.setup(width=600, height=600)
+font_style = pygame.font.SysFont('Roboto', 30)
+def Your_score(score):
+    value = font_style.render("Your Score: " + str(score), True, red)
+    dis.blit(value, [0, 0])
+def snake(snake_List):
+    for x in snake_List:
+        pygame.draw.rect(dis, black, [x[0],x[1],10,10])
+def lose (msg):
+    popup = font_style.render(msg, True, red)
+    dis.blit(popup, [dis_width/6,dis_height/3])
 
-
-# creating the snake 
-snake = turtle.Turtle()
-snake.shape("square")
-snake.color("black")
-snake.penup()
-snake.goto(0, 0)
-snake.direction = "Stop"
-
-# creating the food
-snake_food = turtle.Turtle()
-shapes = random.choice('triangle','circle')
-snake_food.shape(shapes)
-snake_food.color("blue")
-snake_food.speed(0)
-snake_food.penup()
-snake_food.goto(0, 100)
-
-pen = turtle.Turtle()
-pen.speed(0)
-pen.shape('square')
-pen.color('white')
-pen.penup()
-pen.hideturtle()
-pen.goto(0, 250)
-pen.write("Your_score: 0 Highest_Score : 0", align="center", 
-font=("Arial", 24, "normal"))
-
-# Assigning directions
-def moveleft():
-    if snake.direction != "right":
-        snake.direction = "left"
-
-def moveright():
-    if snake.direction != "left":
-        snake.direction = "right"
-
-def moveup():
-    if snake.direction != "down":
-        snake.direction = "up"
-
-def movedown():
-    if snake.direction != "up":
-        snake.direction = "down"
-
-def move():
-    if snake.direction == "up":
-        coord_y = snake.ycor()
-        snake.sety(coord_y+20)
-
-    if snake.direction == "down":
-        coord_y = snake.ycor()
-        snake.sety(coord_y-20)
-
-    if snake.direction == "right":
-        coord_x = snake.xcor()
-        snake.setx(coord_x+20)
-
-    if snake.direction == "left":
-        coord_x = snake.xcor()
-        snake.setx(coord_x-20)
-
-wind.listen()
-wind.onkeypress(moveleft, 'L')
-wind.onkeypress(moveright, 'R')
-wind.onkeypress(moveup, 'U')
-wind.onkeypress(movedown, 'D')
-segments = []
-
-#Implementing the gameplay
-while True:
-    wind.update()
-    if snake.xcor() > 290 or snake.xcor() < -290 or snake.ycor() > 290 or snake.ycor() < -290:
-        time.sleep(1)
-        snake.goto(0, 0)
-        snake.direction = "Stop"
-        snake.shape("square")
-        snake.color("green")
-
-        for segment in segments:
-            segment.goto(1000, 1000)
-            segments.clear()
-            player_score = 0
-            delay_time = 0.1
-            pen.clear()
-            pen.write("Player's_score: {} Highest_score: {}".format(player_score, highest_score), align="center", font=("Arial", 24, "normal"))
-
-        if snake.distance(snake_food) < 20:
-            coord_x = random.randint(-270, 270)
-            coord_y = random.randint(-270, 270)
-            snake_food.goto(coord_x, coord_y)
-
-            # Adding segment
-            added_segment = turtle.Turtle()
-            added_segment.speed(0)
-            added_segment.shape("square")
-            added_segment.color("white")
-            added_segment.penup()
-            segments.append(added_segment)
-            delay_time -= 0.001
-            player_score += 5
-
-            if player_score > highest_score:
-                highest_score = player_score
-                pen.clear()
-                pen.write("Player's_score: {} Highest_score: {}".format(player_score, highest_score), align="center", font=("Arial", 24, "normal"))
-
-    # checking for collisions
-    for i in range(len(segments)-1, 0, -1):
-        coord_x = segments[i-1].xcor()
-        coord_y = segments[i-1].ycor()
-        segments[i].goto(coord_x, coord_y)
-
-    if len(segments) > 0:
-        coord_x = snake.xcor()
-        coord_y = snake.ycor()
-        segments[0].goto(coord_x, coord_y)
-    move()
-
-    for segment in segments:
-        if segment.distance(snake) < 20:
-            time.sleep(1)
-            snake.goto(0, 0)
-            snake.direction = "stop"
-            snake.color('white')
-            snake.shape('square')
-
-            for segment in segments:
-                segment.goto(1000, 1000)
-                segment.clear()
-                player_score = 0
-                delay_time = 0.1
-                pen.clear()
-                pen.write("Player's_score: {} Highest_score: {}".format(player_score, highest_score), align="center", font=("Arial", 24, "normal"))
-                time.sleep(delay_time)
-
-turtle.mainloop()
+def gameLoop():
+    game_over =False
+    game_close =False
+    iX = dis_width/2
+    iY = dis_height/2
+    xmove = 0
+    ymove = 0
+    snake_list =[]
+    snake_length = 1
+    foodx=round(random.randrange(0,dis_width- 10)/10)*10
+    foody=round(random.randrange(0,dis_height- 10)/10)*10
+    while game_close != True:
+        while game_over == True:
+            dis.fill(white)
+            lose('You hit the wall! Press Q-Quit or c to continue')
+            Your_score(snake_length-1)
+            pygame.display.update()
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_q:
+                        game_close= True
+                        game_over = False
+                    if event.key == pygame.K_c:
+                        gameLoop()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game_close == True
+            if event.type == pygame .KEYDOWN:
+                if event.key ==pygame.K_RIGHT:
+                    xmove = 10
+                    ymove = 0
+                elif event.key ==pygame.K_LEFT:
+                    xmove = -10
+                    ymove = 0
+                elif event.key ==pygame.K_UP:
+                    xmove = 0
+                    ymove = -10
+                elif event.key ==pygame.K_DOWN:
+                    xmove = 0
+                    ymove = 10
+        if (iX >= dis_width or iX ==0 or iY >= dis_height or iY ==0):
+            game_over = True
+        iX += xmove
+        iY += ymove
+        dis.fill(white)
+        pygame.draw.rect(dis, green, [foodx, foody, 10, 10])
+        snake_head =[]
+        snake_head.append(iX)
+        snake_head.append(iY)
+        snake_list.append(snake_head)
+        if len(snake_list)> snake_length:
+            del snake_list[0]
+        for x in snake_list[:-1]:
+            if x == snake_head:
+                game_over = True
+        snake(snake_list)
+        Your_score(snake_length - 1)
+        pygame.display.update()
+        if iX ==foodx and iY == foody:
+                foodx=round(random.randrange(0,dis_width- 10)/10)*10
+                foody=round(random.randrange(0,dis_height- 10)/10)*10
+                snake_length += 1
+        clock.tick(30)
+    pygame.quit()
+    quit()
+gameLoop()

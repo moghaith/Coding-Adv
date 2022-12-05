@@ -15,7 +15,7 @@ dis_width = 600
 dis_height = 400
  
 dis = pygame.display.set_mode((dis_width, dis_height))
-pygame.display.set_caption('Snake Game by Edureka')
+pygame.display.set_caption('Snake')
  
 clock = pygame.time.Clock()
  
@@ -27,7 +27,7 @@ score_font = pygame.font.SysFont("comicsansms", 35)
  
  
 def Your_score(score):
-    value = score_font.render("Your Score: " + str(score), True, yellow)
+    value = score_font.render("Your Score: " + str(score), True, red)
     dis.blit(value, [0, 0])
  
  
@@ -61,7 +61,7 @@ def gameLoop():
     while not game_over:
  
         while game_close == True:
-            dis.fill(blue)
+            dis.fill(white)
             message("You Lost! Press C-Play Again or Q-Quit", red)
             Your_score(Length_of_snake - 1)
             pygame.display.update()
@@ -95,7 +95,7 @@ def gameLoop():
             game_close = True
         x1 += x1_change
         y1 += y1_change
-        dis.fill(blue)
+        dis.fill(white)
         pygame.draw.rect(dis, green, [foodx, foody, snake_block, snake_block])
         snake_Head = []
         snake_Head.append(x1)
